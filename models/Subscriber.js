@@ -11,7 +11,7 @@ const subscriberSchema = new mongoose.Schema({
     type: String, 
     required: true, 
     validate: {
-      validator: (v) => /^[0-9]{10}$/.test(v), // 10-digit mobile number
+      validator: (v) => /^[0-9]{10 || 11}$/.test(v), // 10-digit mobile number
       message: (props) => `${props.value} is not a valid mobile number!`
     }
   },
