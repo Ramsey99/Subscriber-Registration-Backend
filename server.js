@@ -37,6 +37,8 @@ app.get('/', (req, res) => {
 
 // Subscriber routes
 app.use('/api/subscribers', subscriberRoutes);
+app.use(subscriberRoutes);
+
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
