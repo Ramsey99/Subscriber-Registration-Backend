@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-// Email transporter
+// Email transporter using environment variables
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -21,43 +21,46 @@ exports.createSubscriber = async (req, res) => {
     const subscriber = new Subscriber(subscriberData);
     await subscriber.save();
 
-    const email = subscriberData.applicantEmail;
+    const conferenceEmail = subscriberData.conferenceEmail; // Send email to official correspondence email
 
-    // Check if email is already verified
-    const existingMail = await Mail.findOne({ email });
+    // Check if the email is already verified
+    const existingMail = await Mail.findOne({ email: conferenceEmail });
     if (existingMail && existingMail.isVerified) {
       return res.status(400).json({ message: "Email is already verified." });
     }
 
     const mail = new Mail({
       name: subscriberData.applicantName,
-      email: email,
+      email: conferenceEmail,
       isVerified: false,
     });
 
     await mail.save();
 
-    // Send verification email without token
-    const verificationLink = `https://subscriber-registration-frontend.vercel.app/verify-email?email=${email}`;
+    // Dynamically select the frontend URL based on the environment
+    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5173'; // Default to local if not set
+
+    // Send verification email to official correspondence email
+    const verificationLink = `${frontendURL}/verify-email?email=${conferenceEmail}`;
+    
     await transporter.sendMail({
-      from: process.env.EMAIL_USER, // Use the email from environment variables
-      to: email,
+      from: process.env.EMAIL_USER, // Sender's email
+      to: conferenceEmail, // Send to the conference email, not the applicant email
       subject: "Email Verification",
-      html: `<p>Thank you for registering! Please verify your email by clicking the link below:</p>
-             <a href="${verificationLink}">Verify Email</a>`,
+      html: `<p>Thank you for registering! Please verify your email by clicking the link below:</p><a href="${verificationLink}">Verify Email</a>`,
     });
 
     res.status(201).json({
-      message: "Subscriber created successfully. Verification email sent.",
+      message: "Subscriber created successfully. Verification email sent to the official email.",
       subscriber,
     });
   } catch (error) {
     console.error("Error creating subscriber or sending email:", error);
-    res.status(500).json({ message: "Failed to create subscriber or send email" });
+    // res.status(500).json({ message: "Failed to create subscriber or send email." });
   }
 };
 
-// Email verification endpoint (without token)
+// Email verification endpoint
 exports.verifyEmail = async (req, res) => {
   const { email } = req.query;
 
