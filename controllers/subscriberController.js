@@ -38,7 +38,7 @@ exports.createSubscriber = async (req, res) => {
     await mail.save();
 
     // Send verification email without token
-    const verificationLink = `http://localhost:5173/verify-email?email=${email}`;
+    const verificationLink = `https://subscriber-registration-frontend.vercel.app/verify-email?email=${email}`;
     await transporter.sendMail({
       from: process.env.EMAIL_USER, // Use the email from environment variables
       to: email,
