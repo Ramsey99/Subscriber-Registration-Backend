@@ -38,7 +38,8 @@ exports.createSubscriber = async (req, res) => {
     await mail.save();
 
     // Dynamically select the frontend URL based on the environment
-    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5173'; // Default to local if not set
+    // const frontendURL = process.env.FRONTEND_URL || 'http://localhost:5173'; // Default to local if not set
+    const frontendURL = 'https://subscriber-registration-frontend.vercel.app'; // Default to local if not set
 
     // Send verification email to official correspondence email
     const verificationLink = `${frontendURL}/verify-email?email=${conferenceEmail}`;
