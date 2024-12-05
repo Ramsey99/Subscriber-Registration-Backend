@@ -85,7 +85,7 @@ exports.verifyEmail = async (req, res) => {
     existingMail.isVerified = true;
     await existingMail.save();
 
-    // res.status(200).json({ message: "Email verified successfully!" });
+    res.status(200).json({ message: "Email verified successfully!" });
   } catch (error) {
     console.error("Error verifying email:", error);
     res.status(500).json({ message: "Error verifying email." });
